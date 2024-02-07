@@ -46,7 +46,7 @@ router.post('/', async (req, res) => {
         amount: body.amount || '',
         currency: body.currency || '',
         email: body.email || '',
-        type: body.type | 'unknown',
+        type: body.type || 'unknown',
         form: body.from_name || 'unkown',
 
         isSubscriptionPayment: body.is_subscription_payment,
