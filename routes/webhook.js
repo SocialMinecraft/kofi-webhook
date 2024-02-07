@@ -19,10 +19,10 @@ var Singleton = require('../singleton');
 });*/
 
 router.post('/', async (req, res) => {
-    const body = req.body.data;
+    const body = JSON.parse(req.body.data);
 
-    console.log(req)
-    console.log(req.body)
+    //console.log(req)
+    //console.log(req.body)
 
     // Check the verification token
     if (Singleton.config.kofiVerification != body.verification_token) {
