@@ -1,6 +1,6 @@
 const { Kafka } = require('kafkajs')
 
-class Kafka_producer {
+class KafkaProducer {
     constructor(clientId, brookers, topic) {
         this.kafka = new Kafka({
             clientId: clientId,
@@ -20,7 +20,8 @@ class Kafka_producer {
     }
 
     async sendMessage(obj){
-        const str = obj.toString();
+        obj.stamp = Math.round(Date.now() / 1000);
+        const str = JSON.stringify(obj) ;
         await this.sendMessageRaw(str);
     }
 
@@ -33,3 +34,5 @@ class Kafka_producer {
         })
     }
 }
+
+module.exports = KafkaProducer;

@@ -8,6 +8,10 @@ var app = require('../app');
 var debug = require('debug')('kofi-events:server');
 var http = require('http');
 
+var Singleton = require('../singleton');
+const Config = require('../config');
+const KafkaProducer = require('../kafka_producer');
+
 /**
  * Get port from environment and store in Express.
  */
@@ -25,9 +29,17 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+const start = async () => {
+  const config = new Config();
+  Singleton.config = config;
+  Singleton.kafka = new KafkaProducer(config.kafkaClientId, config.kafkaBrokers, config.kafkaTopic);
+  await Singleton.kafka.connect();
+
+  server.listen(port);
+  server.on('error', onError);
+  server.on('listening', onListening);
+}
+start();
 
 /**
  * Normalize a port into a number, string, or false.

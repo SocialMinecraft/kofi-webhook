@@ -10,6 +10,9 @@ the kafka events API.
 These values can be passed as environment 
 variables or as part of a .env file.
 
+PORT
+: the port to listen on for requests. (default 3000)
+
 KOFI_VERIFY 
 : The verification token from ko-fi. (default: none)
 
@@ -24,3 +27,24 @@ KAFKA_TOPIC
 
 ## Events
 
+### KOFI_PAYMENT
+```json
+{
+  "eventType": "KOFI_PAYMENT",
+  "stamp": 0,
+  
+  "kofiMessageId": "string",
+  "kofiTimestamp": "string",
+  "kofiTransactionId": "string",
+  
+  "amount": "string",
+  "currency": "string",
+  "email": "string",
+  "type": "string",
+  "from": "string",
+  
+  "isSubscriptionPayment": true,
+  "isFirstSubscriptionPayment": true,
+  "tier_name": "string|null"
+}
+```
