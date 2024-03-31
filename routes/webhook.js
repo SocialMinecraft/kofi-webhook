@@ -21,7 +21,7 @@ router.post('/', async (req, res) => {
     // message_id, timestamp, amount, currency kofi_transaction_id, email
     // is_first_subscription_payment, tier_name (can be null), is_subscription_payment, type
 
-    let root = protobuf.loadSync("./proto/accounts.proto");
+    let root = protobuf.loadSync("./proto/kofi.proto");
     const msgType = root.lookupType("KofiPayment");
     let payload = {
         kofiMessageId: body.message_id || 'unknown',
