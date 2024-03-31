@@ -7,6 +7,8 @@ router.use(bodyParser.json()); // support json encoded bodies
 router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 router.post('/', async (req, res) => {
+
+    // todo - fix so sending invalid data does not crash....
     const body = JSON.parse(req.body.data);
 
     // Check the verification token
