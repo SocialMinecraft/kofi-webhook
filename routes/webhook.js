@@ -5,27 +5,11 @@ var bodyParser = require('body-parser');
 router.use(bodyParser.json()); // support json encoded bodies
 router.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-var Singleton = require('../singleton');
-
-/*router.get('/', async (req, res) => {
-
-    Singleton.kafka.sendMessage({
-        "hello": "world"
-    })
-
-    res.status(200).send({
-        "hello": "world"
-    })
-});*/
-
 router.post('/', async (req, res) => {
     const body = JSON.parse(req.body.data);
 
-    //console.log(req)
-    //console.log(req.body)
-
     // Check the verification token
-    if (Singleton.config.kofiVerification != body.verification_token) {
+    if (global.config.kofiVerification !== body.verification_token) {
         res.status(401).send({
             "error": "Incorrect or missing verification_token"
         })
@@ -36,9 +20,9 @@ router.post('/', async (req, res) => {
     // message_id, timestamp, amount, currency kofi_transaction_id, email
     // is_first_subscription_payment, tier_name (can be null), is_subscription_payment, type
 
-    const msg = {
-        eventType: "KOFI_PAYMENT",
-
+    let root = protobuf.loadSync("./proto/accounts.proto");
+    const msgType = root.lookupType("KofiPayment");
+    let payload = {
         kofiMessageId: body.message_id || 'unknown',
         kofiTimestamp: body.timestamp || '',
         kofiTransactionId: body.kofi_transaction_id || '',
@@ -47,21 +31,30 @@ router.post('/', async (req, res) => {
         currency: body.currency || '',
         email: body.email || '',
         type: body.type || 'unknown',
-        form: body.from_name || 'unkown',
+        from: body.from_name || 'unknown',
 
         isSubscriptionPayment: body.is_subscription_payment,
         isFirstSubscriptionPayment: body.is_first_subscription_payment,
         tier_name: body.tier_name
-
     }
+    const errMsg = msgType.verify(payload);
+    if (errMsg) {
+        console.log(errMsg);
+    }
+    const message = msgType.create(payload);
+    const buffer = msgType.encode(message).finish();
 
-    await Singleton.kafka.sendMessage(msg);
+    try {
+        await global.nc.publish("kofi.payment", buffer, );
+    } catch (err) {
+        console.log("NATS error:", err.message);
+    }
 
     res.status(200).send({
         "status": "accepted"
     });
 
-    // TODO - should probalby look into how non-USD is handled...
+    // TODO - should look into how non-USD is handled...
 });
 
 module.exports = router;
